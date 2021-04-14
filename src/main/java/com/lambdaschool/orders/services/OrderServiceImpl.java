@@ -51,7 +51,7 @@ public class OrderServiceImpl implements OrderService {
             newOrder.getPayments().add(orderPayment);
         }
 
-        return orderRepository.save(order);
+        return orderRepository.save(newOrder);
     }
 
     @Override
