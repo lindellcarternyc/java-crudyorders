@@ -31,4 +31,13 @@ public class OrderServiceImpl implements OrderService {
     public List<Order> findOrdersWithAdvanceAmounts() {
         return orderRepository.findOrdersByAdvanceamountAbove0();
     }
+
+    @Override
+    public void delete(long id) {
+        if (orderRepository.findById(id).isPresent()) {
+            orderRepository.deleteById(id);
+        } else {
+            throw new EntityNotFoundException("Order with id '" + id + "' NOT FOUND");
+        }
+    }
 }

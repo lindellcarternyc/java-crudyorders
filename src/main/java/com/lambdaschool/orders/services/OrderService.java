@@ -8,4 +8,5 @@ public interface OrderService {
     Order save(Order order);
     Order findOrderById(long id);
     List<Order> findOrdersWithAdvanceAmounts();
+    void delete(long id);
 }
