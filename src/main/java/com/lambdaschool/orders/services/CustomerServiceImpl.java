@@ -1,7 +1,12 @@
 package com.lambdaschool.orders.services;
 
+import com.lambdaschool.orders.models.Agent;
 import com.lambdaschool.orders.models.Customer;
+import com.lambdaschool.orders.models.Order;
+import com.lambdaschool.orders.models.Payment;
+import com.lambdaschool.orders.repositories.AgentsRepository;
 import com.lambdaschool.orders.repositories.CustomersRepository;
+import com.lambdaschool.orders.repositories.PaymentRepository;
 import com.lambdaschool.orders.views.OrderCounts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,10 +22,58 @@ public class CustomerServiceImpl implements CustomerService {
     @Autowired
     private CustomersRepository customerRepository;
 
+    @Autowired
+    private AgentsRepository agentsRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
+
     @Transactional
     @Override
     public Customer save(Customer customer) {
-        return customerRepository.save(customer);
+        Customer newCustomer = new Customer();
+
+        if (customer.getCustcode() != 0) {
+            findCustomerById(customer.getCustcode());
+            newCustomer.setCustcode(customer.getCustcode());
+        }
+
+        newCustomer.setCustcity(customer.getCustcity());
+        newCustomer.setCustcountry(customer.getCustcountry());
+        newCustomer.setCustname(customer.getCustname());
+        newCustomer.setGrade(customer.getGrade());
+        newCustomer.setOpeningamt(customer.getOpeningamt());
+        newCustomer.setOutstandingamt(customer.getOutstandingamt());
+        newCustomer.setPaymentamt(customer.getPaymentamt());
+        newCustomer.setPhone(customer.getPhone());
+        newCustomer.setReceiveamt(customer.getReceiveamt());
+        newCustomer.setWorkingarea(customer.getWorkingarea());
+
+        // Agent
+        Agent customerAgent = agentsRepository.findById(customer.getAgent().getAgentcode())
+                .orElseThrow(() -> new EntityNotFoundException("No agent with ID: " + customer.getAgent().getAgentcode() + "FOUND"));
+        customerAgent.getCustomers().add(newCustomer);
+        newCustomer.setAgent(customerAgent);
+
+        // Orders
+        newCustomer.getOrders().clear();
+        for (Order o : customer.getOrders()) {
+            Order newOrder = new Order();
+            newOrder.setAdvanceamount(o.getAdvanceamount());
+            newOrder.setOrdamount(o.getOrdamount());
+            newOrder.setOrderdescription(o.getOrderdescription());
+
+            newOrder.getPayments().clear();
+            for (Payment p : o.getPayments()) {
+                Payment newOrderPayment = paymentRepository.findById(p.getPaymentid())
+                        .orElseThrow(() -> new EntityNotFoundException("Cannot create Customer. Cannot Create order ... Payment ... NOT FOUND"));
+                newOrder.getPayments().add(newOrderPayment);
+            }
+            newOrder.setCustomer(newCustomer);
+            newCustomer.getOrders().add(newOrder);
+        }
+
+        return customerRepository.save(newCustomer);
     }
 
     @Override
