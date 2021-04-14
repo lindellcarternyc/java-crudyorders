@@ -45,4 +45,13 @@ public class CustomerServiceImpl implements CustomerService {
     public List<OrderCounts> findOrderCounts() {
         return customerRepository.findOrderCounts();
     }
+
+    @Override
+    public void delete(long id) {
+        if (customerRepository.findById(id).isPresent()) {
+            customerRepository.deleteById(id);
+        } else {
+            throw new EntityNotFoundException("Customer with id '" + id + "' NOT FOUND");
+        }
+    }
 }
