@@ -70,4 +70,8 @@ public class CustomersController {
 
         return new ResponseEntity<>(savedNewCustomer, responseHeaders, HttpStatus.CREATED);
     }
+
+    // PUT http://localhost:2019/customers/customer/{custcode}
+
+    // PATCH http://localhost:2019/customers/customer/{custcode}
 }

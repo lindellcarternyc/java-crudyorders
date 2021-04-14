@@ -56,4 +56,6 @@ public class OrdersController {
 
         return new ResponseEntity<>(savedNewOrder, responseHeaders, HttpStatus.CREATED);
     }
+
+    // PUT http://localhost:2019/orders/order/{ordnum}
 }
