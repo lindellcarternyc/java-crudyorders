@@ -40,7 +40,7 @@ public class Customer {
     private Agent agent;
 
     @OneToMany(mappedBy = "customer",
-        cascade = {CascadeType.REMOVE},
+        cascade = {CascadeType.REMOVE, CascadeType.PERSIST},
         orphanRemoval = true)
     @JsonIgnoreProperties(value = "customer", allowSetters = true)
     private List<Order> orders = new ArrayList<>();
