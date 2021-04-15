@@ -107,4 +107,68 @@ public class CustomerServiceImpl implements CustomerService {
             throw new EntityNotFoundException("Customer with id '" + id + "' NOT FOUND");
         }
     }
+
+    @Override
+    public Customer update(Customer customer, long id) {
+        Customer updateCustomer = findCustomerById(id);
+
+        if (customer.getCustcity() != null) {
+            updateCustomer.setCustcity(customer.getCustcity());
+        }
+        if (customer.getCustcountry() != null) {
+            updateCustomer.setCustcountry(customer.getCustcountry());
+        }
+        if (customer.getCustname() != null) {
+            updateCustomer.setCustname(customer.getCustname());
+        }
+        if (customer.getGrade() != null) {
+            updateCustomer.setGrade(customer.getGrade());
+        }
+        if (customer.getPhone() != null) {
+            updateCustomer.setPhone(customer.getPhone());
+        }
+        if (customer.getWorkingarea() != null) {
+            updateCustomer.setWorkingarea(customer.getWorkingarea());
+        }
+
+        if (customer.hasValueForOutstandingamt) {
+            updateCustomer.setOutstandingamt(customer.getOutstandingamt());
+        }
+        if (customer.hasValueForOpeningamt) {
+            updateCustomer.setOpeningamt(customer.getOpeningamt());
+        }
+        if (customer.hasValueForPaymentamt) {
+            updateCustomer.setPaymentamt(customer.getPaymentamt());
+        }
+        if (customer.hasValueForReceiveamt) {
+            updateCustomer.setReceiveamt(customer.getReceiveamt());
+        }
+
+        if (customer.getAgent() != null) {
+            Agent customerAgent = agentsRepository.findById(customer.getAgent().getAgentcode())
+                    .orElseThrow(() -> new EntityNotFoundException("No agent with ID: " + customer.getAgent().getAgentcode() + "FOUND"));
+            customerAgent.getCustomers().add(updateCustomer);
+            updateCustomer.setAgent(customerAgent);
+        }
+
+        if (customer.getOrders().size() != 0) {
+            updateCustomer.getOrders().clear();
+            for (Order o : customer.getOrders()) {
+                Order newOrder = new Order();
+                newOrder.setAdvanceamount(o.getAdvanceamount());
+                newOrder.setOrdamount(o.getOrdamount());
+                newOrder.setOrderdescription(o.getOrderdescription());
+
+                newOrder.getPayments().clear();
+                for (Payment p : o.getPayments()) {
+                    Payment newOrderPayment = paymentRepository.findById(p.getPaymentid())
+                            .orElseThrow(() -> new EntityNotFoundException("Cannot create Customer. Cannot Create order ... Payment ... NOT FOUND"));
+                    newOrder.getPayments().add(newOrderPayment);
+                }
+                newOrder.setCustomer(updateCustomer);
+                updateCustomer.getOrders().add(newOrder);
+            }
+        }
+        return updateCustomer;
+    }
 }

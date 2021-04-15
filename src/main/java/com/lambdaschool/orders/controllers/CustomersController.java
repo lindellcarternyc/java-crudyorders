@@ -72,6 +72,17 @@ public class CustomersController {
     }
 
     // PUT http://localhost:2019/customers/customer/{custcode}
+    @PutMapping(value = "/customer/{custcode}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<?> replaceCustomer(@Valid @RequestBody Customer customer, @PathVariable long custcode) {
+        customer.setCustcode(custcode);
+        Customer updateCustomer = customerService.save(customer);
+        return new ResponseEntity<>(updateCustomer, HttpStatus.OK);
+    }
 
     // PATCH http://localhost:2019/customers/customer/{custcode}
+    @PatchMapping(value = "/customer/{custcode}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<?> updateCustomer(@RequestBody Customer customer, @PathVariable long custcode) {
+        Customer updateCustomer = customerService.update(customer, custcode);
+        return new ResponseEntity<>(updateCustomer, HttpStatus.OK);
+    }
 }

@@ -12,4 +12,5 @@ public interface CustomerService {
     List<Customer> findByCustomerNameLike(String nameLike);
     List<OrderCounts> findOrderCounts();
     void delete(long id);
+    Customer update(Customer customer, long id);
 }
