@@ -58,4 +58,11 @@ public class OrdersController {
     }
 
     // PUT http://localhost:2019/orders/order/{ordnum}
+    @PutMapping(value = "/order/{ordnum}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<?> replaceOrder(@PathVariable long ordnum,
+                                          @Valid @RequestBody Order order) {
+        order.setOrdnum(ordnum);
+        Order updateOrder = orderService.save(order);
+        return new ResponseEntity<>(updateOrder, HttpStatus.OK);
+    }
 }

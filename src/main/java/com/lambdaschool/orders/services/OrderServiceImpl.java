@@ -35,14 +35,15 @@ public class OrderServiceImpl implements OrderService {
             newOrder.setOrdnum(order.getOrdnum());
         }
 
-        newOrder.setAdvanceamount(newOrder.getAdvanceamount());
-        newOrder.setOrdamount(newOrder.getOrdamount());
+        newOrder.setAdvanceamount(order.getAdvanceamount());
+        newOrder.setOrdamount(order.getOrdamount());
         newOrder.setOrderdescription(order.getOrderdescription());
 
         Customer orderCustomer = customersRepository.findById(order.getCustomer().getCustcode())
                 .orElseThrow(() -> new EntityNotFoundException("Cannot create order ... Customer not found"));
-        orderCustomer.getOrders().add(newOrder);
+
         newOrder.setCustomer(orderCustomer);
+        orderCustomer.getOrders().add(newOrder);
 
         newOrder.getPayments().clear();
         for (Payment p : order.getPayments()) {
@@ -65,6 +66,7 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.findOrdersByAdvanceamountAbove0();
     }
 
+    @Transactional
     @Override
     public void delete(long id) {
         if (orderRepository.findById(id).isPresent()) {
